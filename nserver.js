@@ -1,24 +1,21 @@
 var http = require('http');
-var postHTML = 
-  '<html><head><title>Post Example</title></head>' +
-  '<body>' +
-  '<form method="post">' +
-  'Input 1: <input name="input1"><br>' +
-  'Input 2: <input name="input2"><br>' +
-  '<input type="submit">' +
-  '</form>' +
-  '</body></html>';
+var fs = require('fs').createWriteStream('file1');;
 
-http.createServer(function (req, res) {
-  var body = "";
-  req.on('data', function (chunk) {
-    body += chunk;
-  });
+http.createServer(function(req, res) {
+  // This opens up the writeable stream to `output`
+  
+
+  // This pipes the POST data to the file
+  req.pipe(fs,{ end:false });
+
+  // After all the data is saved, respond with a simple html form so they can post more data
   req.on('end', function () {
-    console.log('POSTed: ' + body);
-    res.writeHead(200);
-    res.end(postHTML);
+    res.writeHead(200, {"content-type":"text/html"});
+    res.end('<form method="POST"><input name="test" /><input type="submit"></form>');
+  });
+
+  // This is here incase any errors occur
+  fs.on('error', function (err) {
+    console.log(err);
   });
 }).listen(8080);
-
-
